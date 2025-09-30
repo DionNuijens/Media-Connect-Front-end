@@ -15,9 +15,9 @@ export default async function Home() {
 
     // Merge all arrays and optionally tag the source
     const mergedData: Message[] = [
-        ...data.map(item => ({ ...item, source: "Media API!" })),
-        ...data2.map(item => ({ ...item, source: "Auth API!" })),
-        ...data3.map(item => ({ ...item, source: "Social API!" })),
+        ...data.map(item => ({ ...item, source: "Media API" })),
+        ...data2.map(item => ({ ...item, source: "Auth API" })),
+        ...data3.map(item => ({ ...item, source: "Social API" })),
     ];
 
     return (
