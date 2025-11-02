@@ -1,6 +1,6 @@
-import { helloworld } from "@/app/api/media-api";
-import { helloworld2 } from "@/app/api/auth-api";
-import { helloworld3 } from "@/app/api/social-api";
+import { helloworld } from "@/app/lib/api/media-api";
+import { helloworld2 } from "@/app/lib/api/auth-api";
+import { helloworld3 } from "@/app/lib/api/social-api";
 
 type Message = {
     id: number;
