@@ -100,7 +100,7 @@ export default function DashboardPage() {
                 <div className="px-4 py-6 sm:px-0">
                     <div className="border-4 border-dashed border-gray-700 rounded-lg p-8 bg-gray-800">
                         <h2 className="text-2xl font-bold mb-4 text-white">
-                            Welcomee, {user.name || user.email}!
+                            Welcome, {user.name || user.email}!
                         </h2>
                         <p className="text-gray-400 mb-6">
                             You are successfully logged in.
