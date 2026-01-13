@@ -16,7 +16,7 @@ export const tokenStorage = {
         Cookies.set(TOKEN_KEY, token, {
             expires: 7, // 7 days
             sameSite: 'strict',
-            secure: process.env.NODE_ENV === 'production'
+            secure: false  // Allow HTTP for development/testing
         });
         localStorage.setItem(TOKEN_KEY, token);
     },
@@ -30,7 +30,7 @@ export const tokenStorage = {
         Cookies.set(REFRESH_TOKEN_KEY, token, {
             expires: 30, // 30 days
             sameSite: 'strict',
-            secure: process.env.NODE_ENV === 'production'
+            secure: false  // Allow HTTP for development/testing
         });
         localStorage.setItem(REFRESH_TOKEN_KEY, token);
     },
