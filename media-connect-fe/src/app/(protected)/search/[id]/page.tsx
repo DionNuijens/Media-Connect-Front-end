@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import { useAuth } from '@/lib/auth/authContext';
 import { tvShowService } from '@/lib/api/tvShowService';
@@ -21,7 +22,8 @@ export default function ShowDetailPage() {
     const [isSaveLoading, setIsSaveLoading] = useState(false);
 
     // ▶ REGION AUTO DETECT
-    const [userRegion, setUserRegion] = useState<string | null>(null);
+    const [userRegion, setUserRegion] = useState<string | undefined>(undefined);
+    const [imageError, setImageError] = useState<{ [key: string]: boolean }>({});
 
     // useEffect(() => {
     //     if (typeof window !== 'undefined') {
@@ -174,14 +176,14 @@ export default function ShowDetailPage() {
                     <div className="md:flex">
                         {/* Poster */}
                         <div className="md:w-1/3 lg:w-1/4">
-                            {show.fullPosterUrl ? (
-                                <img
+                            {show.fullPosterUrl && !imageError['poster'] ? (
+                                <Image
                                     src={show.fullPosterUrl}
                                     alt={show.name}
+                                    width={500}
+                                    height={750}
                                     className="w-full h-auto object-cover"
-                                    onError={(e) => {
-                                        e.currentTarget.src = 'https://via.placeholder.com/500x750?text=No+Image';
-                                    }}
+                                    onError={() => setImageError(prev => ({ ...prev, poster: true }))}
                                 />
                             ) : (
                                 <div className="w-full aspect-[2/3] bg-gray-700 flex items-center justify-center text-gray-500">
@@ -237,11 +239,14 @@ export default function ShowDetailPage() {
                                                             className="flex items-center bg-gray-700 rounded-lg p-2 hover:bg-gray-600 transition-colors"
                                                             title={provider.provider_name}
                                                         >
-                                                            {provider.fullLogoUrl ? (
-                                                                <img
+                                                            {provider.fullLogoUrl && !imageError[`provider-${provider.provider_id}`] ? (
+                                                                <Image
                                                                     src={provider.fullLogoUrl}
                                                                     alt={provider.provider_name}
+                                                                    width={48}
+                                                                    height={48}
                                                                     className="w-12 h-12 rounded"
+                                                                    onError={() => setImageError(prev => ({ ...prev, [`provider-${provider.provider_id}`]: true }))}
                                                                 />
                                                             ) : (
                                                                 <span className="text-white text-sm px-2">{provider.provider_name}</span>
@@ -262,11 +267,14 @@ export default function ShowDetailPage() {
                                                             className="flex items-center bg-gray-700 rounded-lg p-2 hover:bg-gray-600 transition-colors"
                                                             title={provider.provider_name}
                                                         >
-                                                            {provider.fullLogoUrl ? (
-                                                                <img
+                                                            {provider.fullLogoUrl && !imageError[`provider-${provider.provider_id}`] ? (
+                                                                <Image
                                                                     src={provider.fullLogoUrl}
                                                                     alt={provider.provider_name}
+                                                                    width={48}
+                                                                    height={48}
                                                                     className="w-12 h-12 rounded"
+                                                                    onError={() => setImageError(prev => ({ ...prev, [`provider-${provider.provider_id}`]: true }))}
                                                                 />
                                                             ) : (
                                                                 <span className="text-white text-sm px-2">{provider.provider_name}</span>
@@ -287,11 +295,14 @@ export default function ShowDetailPage() {
                                                             className="flex items-center bg-gray-700 rounded-lg p-2 hover:bg-gray-600 transition-colors"
                                                             title={provider.provider_name}
                                                         >
-                                                            {provider.fullLogoUrl ? (
-                                                                <img
+                                                            {provider.fullLogoUrl && !imageError[`provider-${provider.provider_id}`] ? (
+                                                                <Image
                                                                     src={provider.fullLogoUrl}
                                                                     alt={provider.provider_name}
+                                                                    width={48}
+                                                                    height={48}
                                                                     className="w-12 h-12 rounded"
+                                                                    onError={() => setImageError(prev => ({ ...prev, [`provider-${provider.provider_id}`]: true }))}
                                                                 />
                                                             ) : (
                                                                 <span className="text-white text-sm px-2">{provider.provider_name}</span>
@@ -410,12 +421,15 @@ export default function ShowDetailPage() {
                 </div>
 
                 {/* Backdrop Image */}
-                {show.fullBackdropUrl && (
+                {show.fullBackdropUrl && !imageError['backdrop'] && (
                     <div className="mt-6 rounded-lg overflow-hidden">
-                        <img
+                        <Image
                             src={show.fullBackdropUrl}
                             alt={`${show.name} backdrop`}
+                            width={1920}
+                            height={1080}
                             className="w-full h-auto"
+                            onError={() => setImageError(prev => ({ ...prev, backdrop: true }))}
                         />
                     </div>
                 )}
@@ -423,7 +437,3 @@ export default function ShowDetailPage() {
         </div>
     );
 }
-
-
-
-
