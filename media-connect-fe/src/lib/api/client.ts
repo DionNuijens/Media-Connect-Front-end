@@ -1,7 +1,10 @@
 // src/lib/api/client.ts
 import { tokenStorage } from '../auth/tokenStorage';
 
-const API_URL = process.env.NEXT_PUBLIC_API_GATEWAY_URL;
+// MAKE SURE THIS IS CORRECT:
+const API_URL = process.env.NEXT_PUBLIC_API_GATEWAY_URL;  // ✅ Should be this
+// NOT this:
+// const API_URL = '/api/proxy';  // ❌ Wrong!
 
 export async function apiClient(
     endpoint: string,
@@ -18,7 +21,6 @@ export async function apiClient(
         headers['Authorization'] = `Bearer ${token}`;
     }
 
-    // Make sure endpoint starts with /
     const normalizedEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
 
     const response = await fetch(`${API_URL}${normalizedEndpoint}`, {
@@ -26,7 +28,6 @@ export async function apiClient(
         headers,
     });
 
-    // Handle 401 - redirect to login
     if (response.status === 401) {
         console.warn('⚠️ 401 Unauthorized - redirecting to login');
         tokenStorage.clearTokens();

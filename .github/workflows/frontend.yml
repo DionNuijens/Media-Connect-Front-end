@@ -1,0 +1,42 @@
+name: Frontend CI/CD
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: cd media-connect-fe && npm install
+
+      - name: Build Next.js
+        run: cd media-connect-fe && npm run build
+
+      - name: Log in to Azure Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ secrets.AZURE_REGISTRY_LOGIN_SERVER }}
+          username: ${{ secrets.AZURE_REGISTRY_USERNAME }}
+          password: ${{ secrets.AZURE_REGISTRY_PASSWORD }}
+
+      - name: Build and Push Docker image to Azure
+        uses: docker/build-push-action@v6
+        with:
+          context: ./media-connect-fe
+          file: ./media-connect-fe/Dockerfile
+          push: true
+          tags: ${{ secrets.AZURE_REGISTRY_LOGIN_SERVER }}/frontend:latest

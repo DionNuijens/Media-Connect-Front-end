@@ -5,7 +5,7 @@ import { createContext, useContext, useState, useEffect, ReactNode } from 'react
 import { useRouter } from 'next/navigation';
 import { authService } from './authService';
 import { tokenStorage } from './tokenStorage';
-import { AuthContextType, LoginCredentials, User } from '@/types/auth';
+import { AuthContextType, LoginCredentials, SignupCredentials, User } from '@/types/auth';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -21,7 +21,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
             if (token) {
                 try {
-                    // Fetch user data from /api/user/me
                     const userData = await authService.getCurrentUser(token);
                     console.log('✅ User loaded on init:', userData);
                     setUser(userData);
@@ -40,18 +39,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const login = async (credentials: LoginCredentials) => {
         console.log('🔐 Step 1: Attempting login with:', credentials.email);
 
-        // Step 1: Get token from login endpoint
         const response = await authService.login(credentials);
         console.log('✅ Step 2: Got token from login');
 
-        // Step 2: Save the token
         tokenStorage.setToken(response.token);
 
         if (response.refreshToken) {
             tokenStorage.setRefreshToken(response.refreshToken);
         }
 
-        // Step 3: Fetch user data using the token
         console.log('📡 Step 3: Fetching user data from /api/user/me');
         try {
             const userData = await authService.getCurrentUser(response.token);
@@ -65,6 +61,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         console.log('✅ Step 5: Login complete, redirecting to dashboard');
         router.push('/dashboard');
+    };
+
+    const signup = async (credentials: SignupCredentials) => {
+        console.log('📝 Step 1: Attempting signup with:', credentials.email);
+
+        try {
+            const response = await authService.signup(credentials);
+            console.log('✅ Step 2: Signup successful');
+
+            // Optionally store tokens if your backend returns them (not required for login redirect)
+            if (response.token) {
+                tokenStorage.setToken(response.token);
+            }
+            if (response.refreshToken) {
+                tokenStorage.setRefreshToken(response.refreshToken);
+            }
+
+            console.log('✅ Step 3: Redirecting user to login page');
+            router.push('/login');
+        } catch (error) {
+            console.error('❌ Signup failed:', error);
+            throw new Error('Signup failed, please try again');
+        }
     };
 
     const logout = async () => {
@@ -86,6 +105,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 isLoading,
                 isAuthenticated: !!user,
                 login,
+                signup,
                 logout
             }}
         >

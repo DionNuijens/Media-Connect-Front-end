@@ -1,5 +1,5 @@
 // src/lib/auth/authService.ts
-import { LoginCredentials, AuthResponse } from '@/types/auth';
+import { LoginCredentials, SignupCredentials, AuthResponse } from '@/types/auth';
 
 const API_URL = process.env.NEXT_PUBLIC_API_GATEWAY_URL;
 
@@ -21,9 +21,27 @@ export const authService = {
         return response.json();
     },
 
-    // UPDATED: Use /api/user/me instead of /auth/me
+    signup: async (credentials: SignupCredentials): Promise<AuthResponse> => {
+        console.log('📝 Attempting signup with:', credentials.email);
+
+        const response = await fetch(`${API_URL}/api/auth/register`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(credentials),
+        });
+
+        if (!response.ok) {
+            const error = await response.json().catch(() => ({ message: 'Signup failed' }));
+            throw new Error(error.message || 'Signup failed');
+        }
+
+        return response.json();
+    },
+
     getCurrentUser: async (token: string) => {
-        console.log('📡 Fetching user from /api/user/me with token');
+        console.log('📡 Fetching user from /api/user/me');
 
         const response = await fetch(`${API_URL}/api/user/me`, {
             method: 'GET',
