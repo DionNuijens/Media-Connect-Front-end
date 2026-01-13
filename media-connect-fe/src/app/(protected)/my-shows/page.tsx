@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { useAuth } from '@/lib/auth/authContext';
 import { apiClient } from '@/lib/api/client';
 import { tvShowService } from '@/lib/api/tvShowService';
@@ -62,6 +63,7 @@ export default function MyShowsPage() {
     const [editingShowId, setEditingShowId] = useState<number | null>(null);
     const [editData, setEditData] = useState<{ rating?: number; notes?: string; status?: string }>({});
     const [isSaving, setIsSaving] = useState(false);
+    const [imageError, setImageError] = useState<{ [key: number]: boolean }>({});
 
     useEffect(() => {
         if (!isLoading && !user?.id) {
@@ -194,10 +196,11 @@ export default function MyShowsPage() {
 
         try {
             setIsSaving(true);
+            const statusValue = editData.status as 'watching' | 'completed' | 'planning' | null | undefined;
             const updated = await tvShowService.updateUserShow(user.id, tmdbId, {
                 personalRating: editData.rating,
                 notes: editData.notes,
-                watchStatus: editData.status as any
+                watchStatus: statusValue || undefined
             });
 
             setShows(shows.map(s => s.tmdbId === tmdbId ? updated : s));
@@ -307,7 +310,7 @@ export default function MyShowsPage() {
 
                 {shows.length === 0 ? (
                     <div className="text-center py-12">
-                        <p className="text-gray-400 text-lg mb-4">You haven't saved any shows yet</p>
+                        <p className="text-gray-400 text-lg mb-4">You haven&apos;t saved any shows yet</p>
                         <Link href="/search" className="text-blue-500 hover:text-blue-400">
                             Search and save shows →
                         </Link>
@@ -379,14 +382,13 @@ export default function MyShowsPage() {
                                 >
                                     {/* Poster */}
                                     <div className="relative aspect-[2/3] overflow-hidden bg-gray-700">
-                                        {userShow.show.posterPath ? (
-                                            <img
+                                        {userShow.show.posterPath && !imageError[userShow.id] ? (
+                                            <Image
                                                 src={`https://image.tmdb.org/t/p/w500${userShow.show.posterPath}`}
                                                 alt={userShow.show.name}
+                                                fill
                                                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                                                onError={(e) => {
-                                                    e.currentTarget.src = 'https://via.placeholder.com/300x450?text=No+Image';
-                                                }}
+                                                onError={() => setImageError(prev => ({ ...prev, [userShow.id]: true }))}
                                             />
                                         ) : (
                                             <div className="w-full h-full flex items-center justify-center text-gray-500">
